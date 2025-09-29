@@ -1,7 +1,7 @@
-# dirfix
+# @rahyafthi/dirfix
 
-**Smart automatic `<span dir>` fixer for mixed LTR/RTL HTML.**
-Keeps your text readable with minimal spans, even when Persian, Arabic, Hebrew and Left to Right languages (English, Spanish, ...) are mixed in the same content.
+**Smart automatic `<span dir>` fixer for mixed LTR/RTL HTML.**  
+Keeps your text readable with minimal spans, even when Arabic/Persian and English are mixed in the same content.
 
 ---
 
@@ -15,7 +15,7 @@ Browsers often get confused when you mix LTR (English) and RTL (Persian/Arabic/H
 </p>
 ```
 
-renders inconsistently — numbers and Latin words may “stick” to the wrong side or flip.
+Numbers and Latin words may “stick” to the wrong side or flip.
 
 **dirfix** analyzes the text at the word/phrase level and wraps only the parts that need explicit direction, producing clean, minimal markup.
 
@@ -23,28 +23,25 @@ renders inconsistently — numbers and Latin words may “stick” to the wrong 
 
 ## 🚀 Features
 
-* 🔄 Automatic `<span dir>` wrapping — minimizes span spam
-* 🧠 Heuristic grouping: multi-word opposite runs become **one span**
-* ⚖️ Handles neutrals (digits, punctuation, parentheses) gracefully
-* 🔍 Decodes HTML entities (`&amp;nbsp;`, `&amp;`, etc.) safely
-* 🪄 Configurable:
+- 🔄 Automatic `<span dir>` wrapping — **minimal spans**, no span spam
+- 🧠 Heuristic grouping: multi-word opposite runs become **one span**
+- ⚖️ Handles neutrals (digits, punctuation, parentheses) gracefully
+- 🔍 Decodes HTML entities (`&amp;nbsp;`, `&amp;`, …) safely
+- 🪄 Configurable:
+    - `normalizeSpaces` → turn NBSP into plain space
+    - `decodeTwice` → resolve double-encoded entities (`&amp;nbsp; → &nbsp; → space`)
+    - custom entity maps
+    - custom void tags (`<br>`, `<img>`, …)
+    - custom DOM factory for Node/SSR
+- ⚡ Works in browsers (native `DOMParser`) and Node/CLI (custom or jsdom factory)
+- 📦 Dual build: ESM + CJS, plus a CLI tool
 
-    * `normalizeSpaces` → turn NBSP into plain space
-    * `decodeTwice` → resolve double-encoded entities (`&amp;nbsp; → &nbsp; → space`)
-    * custom entity maps
-    * custom dom parser (for Node/CLI/Jest purpose) user can use any library they wish.
-    * custom wrap query (while `data-dirfix-root="1" seems to be unique, still one can choose their own wrap query)
-    * custom void tags (`<br>`, `<img>`, …)
-    * trim leading spaces
-* ⚡ Works in browsers (native `DOMParser`) and Node/CLI (A DOMParser is needed. jsDomParser is already included but relies on `jsdom` library. If it doesn't fancy you, a custom DOMParser can be passed to dirfix as option)
-* 📦 Dual build: ESM + CJS
-* 📦 Also dirfix-cli can be used for CLI purposes.
 ---
 
 ## 📦 Installation
 
 ```bash
-npm install @rahyafthi/dirfix
+npm i @rahyafthi/dirfix
 ```
 
 ---
@@ -52,28 +49,61 @@ npm install @rahyafthi/dirfix
 ## 🖥 Usage (Library)
 
 ```ts
-import { dirFix } from 'dirfix'
+// ESM
+import { dirFix } from '@rahyafthi/dirfix'
+
+// CJS
+// const { dirFix } = require('@rahyafthi/dirfix')
 
 const input = `
   سلام (gamification) یکی از روش‌های جذاب است.
 `
 
-dirFix(input, 'rtl', {
+const output = dirFix(input, 'rtl', {
   decodeOptions: { normalizeSpaces: true },
   parseOptions: {}
-}).then(output => {
-    console.log(output)
 })
+
+console.log(output)
 ```
 
 Output:
 
 ```html
-سلام 
-<span dir="ltr">
-    (gamification)
-</span>
-یکی از روش‌های جذاب است.
+<span dir="rtl">سلام (</span>
+gamification
+<span dir="rtl">) یکی از روش‌های جذاب است.</span>
+```
+
+---
+
+## 🛠 CLI Usage
+
+```bash
+# Scoped package via npx
+npx @rahyafthi/dirfix --help
+
+# Or run the bin name from the package
+npx -p @rahyafthi/dirfix dirfix input.html output.html
+```
+
+**Options:**
+```
+-d, --dir <ltr|rtl|null>   Default container direction (default: ltr)
+-n, --normalizeSpaces      Convert NBSP-like spaces to U+0020 (default: false)
+-t, --decodeTwice          Decode entities twice (default: true)
+-v, --voidTags <csv>       Extra void tags, e.g. "custom,widget"
+    --trimSpaces           Trim leading inter-part spaces (default: false)
+    --fileMode             Treat input as full HTML file (skip <head>)
+-q, --wrapQuery <attr>     Sentinel attribute for wrapper (default: data-dirfix-root="1")
+-F, --domFactory <path>    Path to a custom DOM factory module (optional)
+```
+
+Examples:
+```bash
+npx -p @rahyafthi/dirfix dirfix -d rtl -n input.html output.html
+npx -p @rahyafthi/dirfix dirfix --voidTags br,hr --trimSpaces input.html
+npx -p @rahyafthi/dirfix dirfix --domFactory ./linkedomFactory.mjs input.html
 ```
 
 ---
@@ -81,27 +111,45 @@ Output:
 ## ⚙️ API
 
 ```ts
-async dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions): Promise<string>
+dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions): string
 ```
 
 ### `DirFixOptions`
 
 ```ts
-import {DomFactory} from "./types";
+type HTMLSymbol = { symbol: string; unicode: string }
+
+type DomFactory = (html: string, innerFactory?: DomFactory) => HTMLElement
 
 type DirFixOptions = {
-    decodeOptions?: {
-        normalizeSpaces?: boolean   // default: false
-        decodeTwice?: boolean       // default: true
-        customEntities?: { symbol: string; unicode: string }[]
-    },
-    parseOptions?: {
-        customDomFactory?: DomFactory   // default: defaultDomFactory
-        customWrapQuery?: string        // default: DomHandler.WRAP_QUERY (data-dirfix-root="1")
-        customVoidTags?: string[]       // default: []
-        trimSpaces?: boolean            // default: false
-    }
+  decodeOptions?: {
+    normalizeSpaces?: boolean   // default: false
+    decodeTwice?: boolean       // default: true
+    customEntities?: HTMLSymbol[]
+  }
+  parseOptions?: {
+    customVoidTags?: string[]
+    trimSpaces?: boolean                 // default: false
+    customDomFactory?: DomFactory        // Node/SSR hook; defaults to internal
+    customWrapQuery?: string             // sentinel attribute; default: data-dirfix-root="1"
+  }
+  fileMode?: boolean                     // true when input is a full HTML file
 }
+```
+
+**Custom DOM factory (advanced)**
+```js
+// linkedomFactory.mjs (ESM)
+import { parseHTML } from 'linkedom'
+export default function linkedomFactory(html) {
+  const { document } = parseHTML(`<!doctype html><body>${html}</body>`)
+  return document.body
+}
+```
+
+Use it in CLI:
+```bash
+npx -p @rahyafthi/dirfix dirfix --domFactory ./linkedomFactory.mjs input.html
 ```
 
 ---
@@ -112,25 +160,33 @@ type DirFixOptions = {
 npm test
 ```
 
-Uses Jest + jsdom for DOM parsing simulation. Tests cover:
-
-* LTR and RTL runs
-* Neutral punctuation and digits
-* Nested tags (`<strong>`, `<em>`)
-* Void elements (`<br>`, `<img>`)
-* Entity decoding
+Uses Jest + jsdom (or a custom factory) to simulate DOM parsing. Tests cover:
+- LTR and RTL runs
+- Neutral punctuation and digits
+- Nested tags (`<strong>`, `<em>`)
+- Void elements (`<br>`, `<img>`)
+- Entity decoding
+- `fileMode` on full HTML files
 
 ---
 
 ## 🎬 Demo GIF
 
-Showcase the problem and solution in \~10s:
+Showcase the problem and solution in ~10s:
 
 1. **The problem:** HTML snippet with mixed Farsi + English; parentheses flip. Add ❌ overlay.
 2. **The fix:** Run `dirfix` (CLI or library). Console shows clean `<span dir>` output.
 3. **The result:** Browser preview shows correct text order. Add ✅ overlay.
 
 *(Insert your recorded GIF here)*
+
+---
+
+## 🧩 Troubleshooting
+
+- **TS “Cannot find module '@rahyafthi/dirfix'”** → set `"moduleResolution": "Bundler"` or `"NodeNext"` in your tsconfig.
+- **Node/CLI without a DOM** → either rely on the default factory that uses a DOM implementation, or pass your own `customDomFactory` (e.g., linkedom).
+- **Node version** → Node 18+ is recommended (modern DOM libs & ESM resolution).
 
 ---
 
@@ -143,13 +199,13 @@ npm run build
 ```
 
 Outputs:
-
-* `dist/esm/index.js`
-* `dist/cjs/index.js`
-* `dist/types/index.d.ts`
+- `dist/esm/index.js`
+- `dist/cjs/index.js`
+- `dist/types/index.d.ts`
 
 ---
 
 ## 📜 License
 
 MIT © [Alireza Tabatabaeian](https://github.com/Alireza-Tabatabaeian)
+
