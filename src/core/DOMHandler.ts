@@ -12,18 +12,16 @@ import {attributeToString, newAttr} from "../tools/elementUtils"
  *
  * The custom nodeParser is expected to return the body part.
  */
-export const defaultDomFactory: DomFactory = (html, nodeParser?: DomFactory) => {
+export const defaultDomFactory: DomFactory = async(html, nodeParser?: DomFactory) => {
     if (typeof DOMParser !== 'undefined') {
         const doc = new DOMParser().parseFromString(html, 'text/html')
         return {element: doc.body as HTMLElement, node: Node}
     }
-    if(nodeParser === undefined){
-        throw new Error(
-            'DOM environment not available. In Node/CLI/Jest, install "jsdom" or provide a custom factory.'
-        )
+    if(nodeParser == null) {
+        throw new Error("In CLI/Node/Jest cases, a node parser should be passed")
     }
     try {
-        return nodeParser(html)
+        return await nodeParser(html)
     } catch (e) {
         throw new Error('The input data could not be parsed.')
     }
@@ -37,21 +35,21 @@ export class DOMHandler {
     wrapQuery : string
 
     constructor(customDomFactory?: DomFactory, customWrapQuery?: string) {
-        this.domFactory = customDomFactory? customDomFactory : defaultDomFactory
+        this.domFactory = customDomFactory != null ? customDomFactory : defaultDomFactory
         this.wrapQuery = customWrapQuery? customWrapQuery : DOMHandler.WRAP_QUERY
     }
 
-    stringToNode(html: string, fileMode: boolean = false):HTMLElement {
+    async stringToNode(html: string, fileMode: boolean = false):Promise<HTMLElement> {
         if(this.domFactory === undefined){
             throw new Error('DOM environment not available.')
         }
-        const raw:string = fileMode ? this.domFactory(html).element.innerHTML : html
-        const {element, node} = this.domFactory(`<div ${this.wrapQuery}>${raw}</div>`)
+        const raw:string = fileMode ? await this.domFactory(html).then(parser => parser.element.innerHTML) : html
+        const {element, node} = await this.domFactory(`<div ${this.wrapQuery}>${raw}</div>`)
         this.nodeFactory = node
         return element.firstChild as HTMLElement
     }
 
-    extractFinalHTML(rendered: Rendered, dirShouldSet: Direction = null, customWrapQuery: string = DOMHandler.WRAP_QUERY): string {
+    async extractFinalHTML(rendered: Rendered, dirShouldSet: Direction = null, customWrapQuery: string = DOMHandler.WRAP_QUERY): Promise<string> {
 
         if(this.domFactory === undefined){
             throw new Error('DOM environment not available.')
@@ -62,7 +60,7 @@ export class DOMHandler {
         }
 
         try {
-            const divElement = this.domFactory(rendered.text).element.firstChild as HTMLElement
+            const divElement = await this.domFactory(rendered.text).then(parsed => parsed.element.firstChild as HTMLElement)
 
             if(divElement === null)
                 return ''

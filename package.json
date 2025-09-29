@@ -1,5 +1,5 @@
 {
-  "name": "dirfix",
+  "name": "@rahyafthi/dirfix",
   "version": "1.0.0",
   "description": "Smart automatic <span dir> fixer for mixed LTR/RTL HTML",
   "license": "MIT",
@@ -8,24 +8,18 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/types/index.d.ts"
-    },
-    "./cli": {
-      "import": "./bin/cli.js",
-      "require": "./bin/cli.cjs"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/esm/index.js"
     }
   },
   "sideEffects": false,
-  "bin": {
-    "dirfix": "../dirfix-cli/bin/cli.js"
-  },
   "scripts": {
     "clean": "rimraf dist",
     "build:esm": "tsc -p tsconfig.esm.json",

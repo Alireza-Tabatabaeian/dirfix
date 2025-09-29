@@ -57,11 +57,13 @@ export type Rendered = {
     direction: Direction,
     spanStack: OpenStack | null,
     space: boolean
-} | null
+}
 
 export type StackAddResult = {
     text: string,
     spanClosed: boolean
 }
 
-export type DomFactory = (html: string) => {element: HTMLElement, node: Partial<Node>}
+export type DomFactoryOutput = {element: HTMLElement, node: Partial<Node>}
+
+export type DomFactory = (html:string) =>  Promise<DomFactoryOutput>

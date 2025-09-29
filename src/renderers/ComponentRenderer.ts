@@ -10,13 +10,18 @@ export const ComponentRenderer = (
     parentDir: Direction,
     space: boolean,
     setDir: boolean = false
-): Rendered | null => {
+): Rendered => {
     if (parsedComponent.type === 'Text') {
         return TextRenderer(parsedComponent.children as Phrase[], outerSpan, parentDir, space)
     }
 
     if (parsedComponent.element === null)
-        return null
+        return {
+            text: '',
+            direction: null,
+            spanStack: outerSpan,
+            space: space,
+        }
 
     const dir = parsedComponent.preferredDirection() ?? parentDir
 
@@ -26,24 +31,23 @@ export const ComponentRenderer = (
     // remove default dir property if exist
     const noDirAttrs: Attr[] = attrs.filter(a => a.name !== 'dir')
 
-    if(parsedComponent.type === 'VoidTag') {
+    if (parsedComponent.type === 'VoidTag') {
 
-        if(tag.toLowerCase() === 'br') // prepend space should be removed if the void tag is br.
+        if (tag.toLowerCase() === 'br') // prepend space should be removed if the void tag is br.
             space = false
 
-        const attributes = (noDirAttrs.length > 0) ?  ' ' + attributeToString(noDirAttrs) : ''
+        const attributes = (noDirAttrs.length > 0) ? ' ' + attributeToString(noDirAttrs) : ''
 
         const tagOutput = `<${tag}${attributes}>`
 
-        if(outerSpan === null) { // this won't be added inside a span
+        if (outerSpan === null) { // this won't be added inside a span
             return {
                 text: tagOutput,
                 direction: null,
                 spanStack: null,
                 space
             }
-        }
-        else { // the span is open, add it to the span waiting items so it will print in order
+        } else { // the span is open, add it to the span waiting items so it will print in order
             const tagAsPhrase = {
                 text: tagOutput,
                 direction: null,
@@ -63,34 +67,32 @@ export const ComponentRenderer = (
     let innerText: string = ''
     let innerSpan: OpenStack | null = null
 
-    if(tag.toLowerCase() === 'p') // p tag took sentence to start of the line, so prepend space should be removed
+    if (tag.toLowerCase() === 'p') // p tag took sentence to start of the line, so prepend space should be removed
         space = false
 
     let multipleWords = false
     let containsNeutral = false
 
-    for(const child of parsedComponent.children as ParsedComponent[]) {
+    for (const child of parsedComponent.children as ParsedComponent[]) {
         multipleWords = multipleWords || child.multipleWords
         containsNeutral = containsNeutral || child.containsNeutrals
         const renderedChild = ComponentRenderer(child, innerSpan, dir, space)
-        if(renderedChild === null)
-            continue
         innerText += renderedChild.text
         innerSpan = renderedChild.spanStack
         space = renderedChild.space
     }
 
-    if(innerSpan !== null) {
+    if (innerSpan !== null) {
         innerText += `</span>${innerSpan.getWaitingString()}`
     }
 
-    if(dir !== null && (dir !== parentDir || setDir)) {
+    if (dir !== null && (dir !== parentDir || setDir)) {
         noDirAttrs.push(newAttr(parsedComponent.element, 'dir', dir))
     }
-    const attributes = (noDirAttrs.length > 0)? ' ' + attributeToString(noDirAttrs) : ''
+    const attributes = (noDirAttrs.length > 0) ? ' ' + attributeToString(noDirAttrs) : ''
 
     // don't add dir if parent has same dir
-    const outerText =  `<${tag}${attributes}>${innerText}</${tag}>`
+    const outerText = `<${tag}${attributes}>${innerText}</${tag}>`
 
     const renderedComponentAsPhrase = {
         text: outerText,
@@ -99,13 +101,13 @@ export const ComponentRenderer = (
         containsNeutral: containsNeutral
     }
 
-    if(outerSpan !== null) {
-        const {text, spanClosed} = addPhraseToStack(outerSpan,renderedComponentAsPhrase, space)
-        if(spanClosed)
+    if (outerSpan !== null) {
+        const {text, spanClosed} = addPhraseToStack(outerSpan, renderedComponentAsPhrase, space)
+        if (spanClosed)
             outerSpan = null
         return {
             text,
-            direction:dir,
+            direction: dir,
             spanStack: outerSpan,
             space
         }

@@ -58,12 +58,12 @@ const input = `
   سلام (gamification) یکی از روش‌های جذاب است.
 `
 
-const output = dirFix(input, 'rtl', {
+dirFix(input, 'rtl', {
   decodeOptions: { normalizeSpaces: true },
   parseOptions: {}
+}).then(output => {
+    console.log(output)
 })
-
-console.log(output)
 ```
 
 Output:
@@ -81,7 +81,7 @@ Output:
 ## ⚙️ API
 
 ```ts
-dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions): string
+async dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions): Promise<string>
 ```
 
 ### `DirFixOptions`

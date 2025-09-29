@@ -26,11 +26,11 @@ import {defaultDomFactory, DOMHandler} from "./core/DOMHandler"
  *     fileMode: boolean // true if the input is the string fetched from a file (which might contains head part)
  * }
  */
-export const dirFix = (
+export const dirFix = async (
     inputHtmlString: string,
     defaultDir: Direction = 'ltr',
     options: Partial<DirFixOptions> = {},
-): string => {
+): Promise<string> => {
 
     const decodeOptions = options.decodeOptions ?? {}
     const parseOptions = options.parseOptions ?? {}
@@ -43,12 +43,11 @@ export const dirFix = (
 
     const domParser = new DOMHandler(customDomFactory, customWrapQuery)
 
-    if(domParser.nodeFactory == null) {
-        return ''
-    }
-
     // now the decoded string needs to be parsed as a tree
-    const rootComponent: HTMLElement = domParser.stringToNode(decodedHTML, fileMode)
+    const rootComponent: HTMLElement = await domParser.stringToNode(decodedHTML, fileMode).then(parsed => parsed)
+
+    if (domParser.nodeFactory == null)
+        return ''
 
     // parse the tree
     const parsedRootComponent: ParsedComponent = nodeParser(rootComponent, domParser.nodeFactory, parseOptions)
@@ -58,7 +57,7 @@ export const dirFix = (
 
     // remove the div which were added to group the incoming childNodes
     return rendered === null ? '' : decodeHtmlEntities(
-        domParser.extractFinalHTML(
+        await domParser.extractFinalHTML(
             rendered,
             rendered.direction !== defaultDir ? rendered.direction : null,
             customWrapQuery
