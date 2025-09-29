@@ -43,6 +43,10 @@ export const dirFix = (
 
     const domParser = new DOMHandler(customDomFactory, customWrapQuery)
 
+    if(domParser.nodeFactory == null) {
+        return ''
+    }
+
     // now the decoded string needs to be parsed as a tree
     const rootComponent: HTMLElement = domParser.stringToNode(decodedHTML, fileMode)
 
@@ -53,7 +57,7 @@ export const dirFix = (
     const rendered: Rendered = ComponentRenderer(parsedRootComponent, null, defaultDir, false)
 
     // remove the div which were added to group the incoming childNodes
-    return decodeHtmlEntities(
+    return rendered === null ? '' : decodeHtmlEntities(
         domParser.extractFinalHTML(
             rendered,
             rendered.direction !== defaultDir ? rendered.direction : null,

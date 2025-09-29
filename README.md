@@ -36,7 +36,7 @@ renders inconsistently — numbers and Latin words may “stick” to the wrong 
     * custom wrap query (while `data-dirfix-root="1" seems to be unique, still one can choose their own wrap query)
     * custom void tags (`<br>`, `<img>`, …)
     * trim leading spaces
-* ⚡ Works in browsers (native `DOMParser`) and Node/CLI (falls back to `DomFactory` --by default is `defaultDomFactory` which relies on `jsdom` but the package is optional so needs to be installed manually--)
+* ⚡ Works in browsers (native `DOMParser`) and Node/CLI (A DOMParser is needed. jsDomParser is already included but relies on `jsdom` library. If it doesn't fancy you, a custom DOMParser can be passed to dirfix as option)
 * 📦 Dual build: ESM + CJS
 * 📦 Also dirfix-cli can be used for CLI purposes.
 ---

@@ -17,12 +17,15 @@ export const defaultDomFactory: DomFactory = (html, nodeParser?: DomFactory) => 
         const doc = new DOMParser().parseFromString(html, 'text/html')
         return {element: doc.body as HTMLElement, node: Node}
     }
-    try {
-        return nodeParser(html)
-    } catch (e) {
+    if(nodeParser === undefined){
         throw new Error(
             'DOM environment not available. In Node/CLI/Jest, install "jsdom" or provide a custom factory.'
         )
+    }
+    try {
+        return nodeParser(html)
+    } catch (e) {
+        throw new Error('The input data could not be parsed.')
     }
 }
 
@@ -39,6 +42,9 @@ export class DOMHandler {
     }
 
     stringToNode(html: string, fileMode: boolean = false):HTMLElement {
+        if(this.domFactory === undefined){
+            throw new Error('DOM environment not available.')
+        }
         const raw:string = fileMode ? this.domFactory(html).element.innerHTML : html
         const {element, node} = this.domFactory(`<div ${this.wrapQuery}>${raw}</div>`)
         this.nodeFactory = node
@@ -46,8 +52,20 @@ export class DOMHandler {
     }
 
     extractFinalHTML(rendered: Rendered, dirShouldSet: Direction = null, customWrapQuery: string = DOMHandler.WRAP_QUERY): string {
+
+        if(this.domFactory === undefined){
+            throw new Error('DOM environment not available.')
+        }
+
+        if(rendered === null) {
+            return  ''
+        }
+
         try {
             const divElement = this.domFactory(rendered.text).element.firstChild as HTMLElement
+
+            if(divElement === null)
+                return ''
 
             if(!dirShouldSet)
                 return divElement.innerHTML

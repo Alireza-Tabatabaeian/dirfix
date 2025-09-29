@@ -10,8 +10,7 @@ export const ComponentRenderer = (
     parentDir: Direction,
     space: boolean,
     setDir: boolean = false
-): Rendered => {
-
+): Rendered | null => {
     if (parsedComponent.type === 'Text') {
         return TextRenderer(parsedComponent.children as Phrase[], outerSpan, parentDir, space)
     }
@@ -62,7 +61,7 @@ export const ComponentRenderer = (
     }
 
     let innerText: string = ''
-    let innerSpan: OpenStack = null as OpenStack | null
+    let innerSpan: OpenStack | null = null
 
     if(tag.toLowerCase() === 'p') // p tag took sentence to start of the line, so prepend space should be removed
         space = false
@@ -74,6 +73,8 @@ export const ComponentRenderer = (
         multipleWords = multipleWords || child.multipleWords
         containsNeutral = containsNeutral || child.containsNeutrals
         const renderedChild = ComponentRenderer(child, innerSpan, dir, space)
+        if(renderedChild === null)
+            continue
         innerText += renderedChild.text
         innerSpan = renderedChild.spanStack
         space = renderedChild.space
@@ -83,7 +84,7 @@ export const ComponentRenderer = (
         innerText += `</span>${innerSpan.getWaitingString()}`
     }
 
-    if(dir !== parentDir || setDir) {
+    if(dir !== null && (dir !== parentDir || setDir)) {
         noDirAttrs.push(newAttr(parsedComponent.element, 'dir', dir))
     }
     const attributes = (noDirAttrs.length > 0)? ' ' + attributeToString(noDirAttrs) : ''
