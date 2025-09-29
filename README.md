@@ -59,12 +59,12 @@ const input = `
   سلام (gamification) یکی از روش‌های جذاب است.
 `
 
-const output = dirFix(input, 'rtl', {
+dirFix(input, 'rtl', {
   decodeOptions: { normalizeSpaces: true },
   parseOptions: {}
+}).then(output => {
+    console.log(output)
 })
-
-console.log(output)
 ```
 
 Output:
@@ -79,6 +79,7 @@ gamification
 
 ## 🛠 CLI Usage
 
+""" COMING SOON """
 ```bash
 # Scoped package via npx
 npx @rahyafthi/dirfix --help
@@ -111,7 +112,7 @@ npx -p @rahyafthi/dirfix dirfix --domFactory ./linkedomFactory.mjs input.html
 ## ⚙️ API
 
 ```ts
-dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions): string
+async dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions): Promise<string>
 ```
 
 ### `DirFixOptions`
@@ -178,7 +179,7 @@ Showcase the problem and solution in ~10s:
 2. **The fix:** Run `dirfix` (CLI or library). Console shows clean `<span dir>` output.
 3. **The result:** Browser preview shows correct text order. Add ✅ overlay.
 
-*(Insert your recorded GIF here)*
+*(COMING SOON)*
 
 ---
 
