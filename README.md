@@ -44,7 +44,7 @@ renders inconsistently — numbers and Latin words may “stick” to the wrong 
 ## 📦 Installation
 
 ```bash
-npm install dirfix
+npm install @rahyafthi/dirfix
 ```
 
 ---
