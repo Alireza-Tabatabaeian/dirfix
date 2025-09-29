@@ -33,7 +33,9 @@
     "build:types": "tsc -p tsconfig.types.json",
     "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types",
     "prepublishOnly": "npm run build",
-    "test": "jest --runInBand"
+    "test:esm": "jest -c jest.esm.config.ts",
+    "test:cjs": "jest -c jest.cjs.config.ts",
+    "test": "npm run test:cjs && npm run test:esm"
   },
   "keywords": [
     "rtl",
@@ -54,13 +56,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Alireza-Tabatabaeian/dirfix.git"
+    "url": "https://github.com/Alireza-Tabatabaeian/dirfix"
   },
   "bugs": {
     "url": "https://github.com/Alireza-Tabatabaeian/dirfix/issues"
   },
   "homepage": "https://github.com/Alireza-Tabatabaeian/dirfix#readme",
-  "dependencies": {
+  "optionalDependencies": {
     "jsdom": "^26.1.0"
   },
   "devDependencies": {
@@ -70,6 +72,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
   "jest": {

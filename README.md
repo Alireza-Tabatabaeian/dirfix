@@ -1,7 +1,7 @@
 # dirfix
 
 **Smart automatic `<span dir>` fixer for mixed LTR/RTL HTML.**
-Keeps your text readable with minimal spans, even when Arabic/Persian and English are mixed in the same content.
+Keeps your text readable with minimal spans, even when Persian, Arabic, Hebrew and Left to Right languages (English, Spanish, ...) are mixed in the same content.
 
 ---
 
@@ -32,10 +32,13 @@ renders inconsistently — numbers and Latin words may “stick” to the wrong 
     * `normalizeSpaces` → turn NBSP into plain space
     * `decodeTwice` → resolve double-encoded entities (`&amp;nbsp; → &nbsp; → space`)
     * custom entity maps
+    * custom dom parser (for Node/CLI/Jest purpose) user can use any library they wish.
+    * custom wrap query (while `data-dirfix-root="1" seems to be unique, still one can choose their own wrap query)
     * custom void tags (`<br>`, `<img>`, …)
-* ⚡ Works in browsers (native `DOMParser`) and Node/CLI (falls back to `jsdom`)
-* 📦 Dual build: ESM + CJS, plus a CLI tool
-
+    * trim leading spaces
+* ⚡ Works in browsers (native `DOMParser`) and Node/CLI (falls back to `DomFactory` --by default is `defaultDomFactory` which relies on `jsdom` but the package is optional so needs to be installed manually--)
+* 📦 Dual build: ESM + CJS
+* 📦 Also dirfix-cli can be used for CLI purposes.
 ---
 
 ## 📦 Installation
@@ -75,18 +78,6 @@ Output:
 
 ---
 
-## 🛠 CLI Usage
-
-```bash
-npx dirfix input.html output.html
-```
-
-* First argument: input HTML file
-* Second argument (optional): output file. If omitted, prints to stdout.
-* Default direction: `ltr` (can be configured in future versions with flags).
-
----
-
 ## ⚙️ API
 
 ```ts
@@ -96,15 +87,20 @@ dirFix(html: string, defaultDir: 'ltr' | 'rtl' | null, options?: DirFixOptions):
 ### `DirFixOptions`
 
 ```ts
+import {DomFactory} from "./types";
+
 type DirFixOptions = {
-  decodeOptions?: {
-    normalizeSpaces?: boolean   // default: false
-    decodeTwice?: boolean       // default: true
-    customEntities?: { symbol: string; unicode: string }[]
-  },
-  parseOptions?: {
-    customVoidTags?: string[]
-  }
+    decodeOptions?: {
+        normalizeSpaces?: boolean   // default: false
+        decodeTwice?: boolean       // default: true
+        customEntities?: { symbol: string; unicode: string }[]
+    },
+    parseOptions?: {
+        customDomFactory?: DomFactory   // default: defaultDomFactory
+        customWrapQuery?: string        // default: DomHandler.WRAP_QUERY (data-dirfix-root="1")
+        customVoidTags?: string[]       // default: []
+        trimSpaces?: boolean            // default: false
+    }
 }
 ```
 

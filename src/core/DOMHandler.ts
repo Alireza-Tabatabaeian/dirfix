@@ -1,29 +1,18 @@
 import {Direction, DomFactory, Rendered} from "./types"
-import {createRequire} from 'module'
-import {attributeToString, newAttr} from "../tools/elementUtils";
-
-function loadJsdom():
-    | (typeof import('jsdom'))
-    | undefined {
-    try {
-        // Prefer native require if available (CJS), otherwise synthesize require (ESM)
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const req = typeof require === 'function' ? require : createRequire(import.meta.url)
-        return req('jsdom')
-    } catch {
-        return undefined
-    }
-}
+import {attributeToString, newAttr} from "../tools/elementUtils"
 
 /**
- * Warning: For Node/CLI/JEST default usage (not providing custom nodeParser), jsdom library is needed.
+ * Warning: For Node/CLI/JEST a DomFactory function is needed.
+ * The jsDomFactory exists as a ready to use instance however,
+ * it depends on "jsdom" library, so make sure it's installed
+ * before using it.
  *
  * @param html
- * @param nodeParser // the default is jsDomFactory which depends on jsdom library(should be installed manually).
+ * @param nodeParser
  *
  * The custom nodeParser is expected to return the body part.
  */
-export const defaultDomFactory: DomFactory = (html, nodeParser: DomFactory = jsDomFactory) => {
+export const defaultDomFactory: DomFactory = (html, nodeParser?: DomFactory) => {
     if (typeof DOMParser !== 'undefined') {
         const doc = new DOMParser().parseFromString(html, 'text/html')
         return {element: doc.body as HTMLElement, node: Node}
@@ -35,18 +24,6 @@ export const defaultDomFactory: DomFactory = (html, nodeParser: DomFactory = jsD
             'DOM environment not available. In Node/CLI/Jest, install "jsdom" or provide a custom factory.'
         )
     }
-}
-
-const jsDomFactory: DomFactory = (html: string) => {
-    const mod = loadJsdom()
-    if (!mod) {
-        throw new Error(
-            'DOM environment not available. In Node/CLI/Jest, install "jsdom" or provide a custom factory.'
-        )
-    }
-    const { JSDOM } = mod
-    const dom = new JSDOM(`<!doctype html><body>${html}</body>`)
-    return {element: dom.window.document.body as HTMLElement, node: dom.window.Node}
 }
 
 export class DOMHandler {

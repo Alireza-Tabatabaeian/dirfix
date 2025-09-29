@@ -53,5 +53,11 @@ export const dirFix = (
     const rendered: Rendered = ComponentRenderer(parsedRootComponent, null, defaultDir, false)
 
     // remove the div which were added to group the incoming childNodes
-    return domParser.extractFinalHTML(rendered, rendered.direction !== defaultDir ? rendered.direction : null, customWrapQuery)
+    return decodeHtmlEntities(
+        domParser.extractFinalHTML(
+            rendered,
+            rendered.direction !== defaultDir ? rendered.direction : null,
+            customWrapQuery
+        ), decodeOptions
+    )
 }

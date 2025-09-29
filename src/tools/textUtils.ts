@@ -83,4 +83,3 @@ export function decodeHtmlEntities(input: string, decodeOptions: DecodeOptions =
     }
     return result
 }
-

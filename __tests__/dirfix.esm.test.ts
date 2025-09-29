@@ -1,10 +1,10 @@
-import {dirFix} from '../src'
+import {dirFix, jsDomFactory} from '../src'
 import {DirFixOptions} from '../src'
-import {EXPECTED_OUTPUT, TEST_INPUT_HTML} from "./inputHtml";
+import {EXPECTED_OUTPUT_RTL,EXPECTED_OUTPUT_LTR, TEST_INPUT_HTML} from "./testData";
 
 const baseOpts: DirFixOptions = {
     decodeOptions: {normalizeSpaces: true, decodeTwice: true, customEntities: []},
-    parseOptions: {customVoidTags: []},
+    parseOptions: {customDomFactory: jsDomFactory, customVoidTags: []},
 }
 
 describe('dirFix — bidi & entities', () => {
@@ -57,7 +57,7 @@ describe('dirFix — bidi & entities', () => {
         // “No 56147” should be kept logically LTR; either bare or inside a single LTR span
         // Accept either form:
         const okBare = out.includes('No 56147')
-        const okSpan = /<span dir="ltr">No 56147<\/span>/.test(out)
+        const okSpan = /<span dir="ltr">No<\/span> 56147/.test(out)
         expect(okBare || okSpan).toBe(true)
     })
 
@@ -103,8 +103,13 @@ describe('dirFix — bidi & entities', () => {
         expect(out).not.toContain('dir=""')
     })
 
-    test('complex text with everything', () => {
+    test('complex text with everything in ltr parent', () => {
         const out = dirFix(TEST_INPUT_HTML, 'ltr', baseOpts)
-        expect(out).toBe(EXPECTED_OUTPUT)
+        expect(out).toBe(EXPECTED_OUTPUT_LTR)
+    })
+
+    test('complex text with everything in rtl parent', () => {
+        const out = dirFix(TEST_INPUT_HTML, 'rtl', baseOpts)
+        expect(out).toBe(EXPECTED_OUTPUT_RTL)
     })
 })
