@@ -1,6 +1,6 @@
 {
   "name": "@rahyafthi/dirfix",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Smart automatic <span dir> fixer for mixed LTR/RTL HTML",
   "license": "MIT",
   "author": "Alireza Tabatabaeian",
