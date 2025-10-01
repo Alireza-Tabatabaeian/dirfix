@@ -70,9 +70,9 @@ dirFix(input, 'rtl', {
 Output:
 
 ```html
-<span dir="rtl">سلام (</span>
-gamification
-<span dir="rtl">) یکی از روش‌های جذاب است.</span>
+سلام 
+<span dir="ltr">(gamification)</span>
+یکی از روش‌های جذاب است.
 ```
 
 ---
@@ -166,6 +166,7 @@ Uses Jest + jsdom (or a custom factory) to simulate DOM parsing. Tests cover:
 - Neutral punctuation and digits
 - Nested tags (`<strong>`, `<em>`)
 - Void elements (`<br>`, `<img>`)
+- Scripts (`<script>`)
 - Entity decoding
 - `fileMode` on full HTML files
 

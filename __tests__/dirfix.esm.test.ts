@@ -112,4 +112,11 @@ describe('dirFix — bidi & entities', () => {
         const out = await dirFix(TEST_INPUT_HTML, 'rtl', baseOpts)
         expect(out).toBe(EXPECTED_OUTPUT_RTL)
     })
+
+    test('it should bypass scripts', async () => {
+        const html = `Check this test:<br><div id="test">اینجا ما یکسری جمله فارسی داریم فقط، واضحه؟</div><script>el = document.getElementById('test');el.innerText="And now it's converted to English"</script>`
+        const expected_output = `Check this test:<br><div id="test" dir="rtl">اینجا ما یکسری جمله فارسی داریم فقط، واضحه؟</div><script>el = document.getElementById('test');el.innerText="And now it's converted to English"</script>`
+        const out = await dirFix(html, 'ltr', baseOpts)
+        expect(out).toBe(expected_output)
+    })
 })

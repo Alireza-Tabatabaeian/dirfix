@@ -28,7 +28,7 @@ export type Word = {
     containsNeutral: boolean
 }
 
-export type Component = 'Text' | 'VoidTag' | 'Element'
+export type Component = 'Text' | 'VoidTag' | 'Script' | 'Element'
 
 export type Phrase = {
     text: string,
@@ -66,4 +66,4 @@ export type StackAddResult = {
 
 export type DomFactoryOutput = {element: HTMLElement, node: Partial<Node>}
 
-export type DomFactory = (html:string) =>  Promise<DomFactoryOutput>
+export type DomFactory = (html:string, fileMode?:boolean) =>  Promise<DomFactoryOutput>

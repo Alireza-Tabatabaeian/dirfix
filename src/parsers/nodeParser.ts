@@ -1,16 +1,15 @@
 import {ParsedComponent} from "../core/ParsedComponent"
 import {textParser} from "./textParser"
-import {isVoidTag} from "../tools/elementUtils"
+import {isScriptTag, isVoidTag} from "../tools/elementUtils"
 import {childrenParser} from "./childrenParser"
 import {ParseOptions} from "../core/types"
-import {DOMHandler} from "../core/DOMHandler";
 
 /**
  *
  *
  *
  * @param element
- * @param domHandler
+ * @param node
  * @param parseOptions
  */
 export const nodeParser =
@@ -30,6 +29,10 @@ export const nodeParser =
         const el = element as Element
         if (isVoidTag(el, customVoidTags)) {
             return new ParsedComponent('VoidTag', el)
+        }
+
+        if(isScriptTag(el)) {
+            return new ParsedComponent('Script', el)
         }
 
         const parsedComponent = new ParsedComponent('Element', el)

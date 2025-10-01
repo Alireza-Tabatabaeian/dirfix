@@ -31,14 +31,14 @@ export const ComponentRenderer = (
     // remove default dir property if exist
     const noDirAttrs: Attr[] = attrs.filter(a => a.name !== 'dir')
 
-    if (parsedComponent.type === 'VoidTag') {
+    if (parsedComponent.type === 'VoidTag' || parsedComponent.type === 'Script') {
 
         if (tag.toLowerCase() === 'br') // prepend space should be removed if the void tag is br.
             space = false
 
         const attributes = (noDirAttrs.length > 0) ? ' ' + attributeToString(noDirAttrs) : ''
 
-        const tagOutput = `<${tag}${attributes}>`
+        const tagOutput = parsedComponent.type === 'Script' ? `<script${attributes}>${parsedComponent.element.textContent}</script>` : `<${tag}${attributes}>`
 
         if (outerSpan === null) { // this won't be added inside a span
             return {
