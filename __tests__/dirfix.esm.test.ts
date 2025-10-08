@@ -1,6 +1,7 @@
-import {dirFix, jsDomFactory} from '../src'
+import {dirFix} from '../src'
 import {DirFixOptions} from '../src'
-import {EXPECTED_OUTPUT_RTL, EXPECTED_OUTPUT_LTR, TEST_INPUT_HTML} from "./testData";
+import jsDomFactory from "jsdomfactory"
+import {EXPECTED_OUTPUT_RTL, EXPECTED_OUTPUT_LTR, TEST_INPUT_HTML} from "./testData"
 
 const baseOpts: DirFixOptions = {
     decodeOptions: {normalizeSpaces: true, decodeTwice: true, customEntities: []},
@@ -117,6 +118,13 @@ describe('dirFix — bidi & entities', () => {
         const html = `Check this test:<br><div id="test">اینجا ما یکسری جمله فارسی داریم فقط، واضحه؟</div><script>el = document.getElementById('test');el.innerText="And now it's converted to English"</script>`
         const expected_output = `Check this test:<br><div id="test" dir="rtl">اینجا ما یکسری جمله فارسی داریم فقط، واضحه؟</div><script>el = document.getElementById('test');el.innerText="And now it's converted to English"</script>`
         const out = await dirFix(html, 'ltr', baseOpts)
+        expect(out).toBe(expected_output)
+    })
+
+    test('strange case', async () => {
+        const mixedData = `<p>این یک متن آزمایشی است (it includes English words) و حتی a full sentence داخل متن فارسی.<br/>حالا اعداد: 12345 و اعداد فارسی ۱۲۳۴۵.<br/>Mixed punctuation: <strong>سلام؟ hello!</strong> (آیا کار میکند؟) yes/no.<br/>یک ایمیل: text@example.com و یک URL: https://example.com/page?foo-a&bar=2<br/>و در آخر یک کلمه فارسی با حروف لاتین: Farsi.</p>`
+        const expected_output = `<p dir="rtl">این یک متن آزمایشی است <span dir="ltr">(it includes English words)</span> و حتی <span dir="ltr">a full sentence</span> داخل متن فارسی.<br/>حالا اعداد: 12345 و اعداد فارسی ۱۲۳۴۵.<br/><span dir="ltr">Mixed punctuation:</span> <strong>سلام؟ <span dir="ltr">hello!</span></strong> (آیا کار میکند؟) <span dir="ltr">yes/no.</span><br/>یک ایمیل: <span dir="ltr">text@example.com</span> و یک <span dir="ltr">URL: https://example.com/page?foo-a&bar=2</span><br/>و در آخر یک کلمه فارسی با حروف لاتین: <span dir="ltr">Farsi.</span></p>`
+        const out = await dirFix(mixedData, 'ltr', {parseOptions:{customDomFactory:jsDomFactory}})
         expect(out).toBe(expected_output)
     })
 })

@@ -13,3 +13,7 @@ yarn-error.log*
 package-lock.json
 
 .DS_Store
+dist
+tsbuild.wizard.json
+.tmp-wizard
+rahyafthi-dirfix-*.tgz
