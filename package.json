@@ -1,6 +1,6 @@
 {
   "name": "@rahyafthi/dirfix",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Smart automatic <span dir> fixer for mixed LTR/RTL HTML",
   "license": "MIT",
   "type": "module",
@@ -63,7 +63,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdomfactory": "^1.0.0",
     "rimraf": "^6.0.1",
-    "ts-build-wizard": "^1.0.4",
+    "ts-build-wizard": "^1.0.5",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "tsdown": "^0.15.0",
