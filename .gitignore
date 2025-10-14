@@ -17,3 +17,4 @@ dist
 tsbuild.wizard.json
 .tmp-wizard
 rahyafthi-dirfix-*.tgz
+node_modules

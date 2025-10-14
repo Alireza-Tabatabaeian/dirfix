@@ -7,20 +7,15 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/cjs/index.cjs",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/esm/index.d.ts",
+  "main": "./dist/esm/index.mjs",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/esm/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
+      "import": "./dist/esm/index.mjs",
       "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.js"
-    },
-    "./jsdomFactory": {
-      "import": "./dist/esm/jsdomFactory.js",
-      "require": "./dist/cjs/jsdomFactory.cjs",
-      "default": "./dist/esm/jsdomFactory.js"
+      "types": "./dist/esm/index.d.mts",
+      "default": "./dist/esm/index.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -68,7 +63,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdomfactory": "^1.0.0",
     "rimraf": "^6.0.1",
-    "ts-build-wizard": "^1.0.3",
+    "ts-build-wizard": "^1.0.4",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "tsdown": "^0.15.0",
